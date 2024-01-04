@@ -40,4 +40,20 @@ const menu = document.querySelector('.header__menu');
 
 burger.addEventListener('click', () => {
   menu.classList.toggle('header__menu_active');
+
+  menu.addEventListener('click', ({target}) => {
+    if (target.closest('.header__link')) {
+      menu.classList.remove('header__menu_active');
+    }
+  });
+});
+
+document.addEventListener('click', ({target}) => {
+  const its_menu = target === menu || menu.contains(target);
+  const its_btnMenu = target === burger;
+  const menu_is_active = menu.classList.contains('header__menu_active');
+
+  if (!its_menu && !its_btnMenu && menu_is_active) {
+    menu.classList.remove('header__menu_active');
+  }
 });
