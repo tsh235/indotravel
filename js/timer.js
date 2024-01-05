@@ -19,7 +19,7 @@ export const timer = () => {
     timerCountDays.classList.add('timer__count_days');
 
     const timerUnitsDays = document.createElement('span');
-    timerUnitsDays.classList.add('.timer__units_days');
+    timerUnitsDays.classList.add('timer__units_days');
 
     timerItemDays.append(timerCountDays, timerUnitsDays);
 
@@ -30,7 +30,7 @@ export const timer = () => {
     timerCountHours.classList.add('timer__count_hours');
 
     const timerUnitsHours = document.createElement('span');
-    timerUnitsHours.classList.add('.timer__units_hours');
+    timerUnitsHours.classList.add('timer__units_hours');
 
     timerItemHours.append(timerCountHours, timerUnitsHours);
 
