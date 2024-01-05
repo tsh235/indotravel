@@ -49,11 +49,11 @@ burger.addEventListener('click', () => {
 });
 
 document.addEventListener('click', ({target}) => {
-  const its_menu = target === menu || menu.contains(target);
-  const its_btnMenu = target === burger;
-  const menu_is_active = menu.classList.contains('header__menu_active');
+  const itsMenu = target === menu || menu.contains(target);
+  const itsBtnMenu = target === burger;
+  const menuIsActive = menu.classList.contains('header__menu_active');
 
-  if (!its_menu && !its_btnMenu && menu_is_active) {
+  if (!itsMenu && !itsBtnMenu && menuIsActive) {
     menu.classList.remove('header__menu_active');
   }
 });
