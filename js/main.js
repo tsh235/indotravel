@@ -13,21 +13,21 @@ textWrappers.forEach(elem => {
   }
 });
 
-items.forEach((item, index) => {
+items.forEach(item => {
   item.addEventListener('click', ({target}) => {
-    const textWrapper = target.nextElementSibling;
-    if (target === buttons[index]) {
+    const textWrapper = item.querySelector('.travel__item-text-wrapper');
+
+    if (textWrapper.style.height === '') {
       textWrapper.style.height =
         item.classList.contains('travel__item_active') ?
         '' : `${heightWrapper}px`;
-        item.classList.toggle('travel__item_active');
-      } else {
-        textWrappers[index].style.height = '';
-        items[index].classList.remove('travel__item_active');
+      item.classList.toggle('travel__item_active');
+    } else {
+      textWrapper.style.height = '';
+      item.classList.remove('travel__item_active');
     }
-  });
+  })
 });
-
 
 // buttons.forEach((btn, index) => {
 //   btn.addEventListener('click', () => {
