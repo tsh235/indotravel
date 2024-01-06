@@ -3,7 +3,6 @@ import { timer } from "./timer.js";
 timer();
 
 const items = document.querySelectorAll('.travel__item');
-const buttons = document.querySelectorAll('.travel__item-title');
 const textWrappers = document.querySelectorAll('.travel__item-text-wrapper');
 
 let heightWrapper = 0;
@@ -34,29 +33,6 @@ items.forEach(item => {
     }
   })
 });
-
-document.querySelectorAll('li').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('li').forEach(li => li.classList.remove('active'));
-    item.classList.add('active');
-  })
-})
-
-// buttons.forEach((btn, index) => {
-//   btn.addEventListener('click', () => {
-//     for (let i = 0; i < items.length; i++) {
-//       if (index === i) {
-//         textWrappers[i].style.height =
-//           items[i].classList.contains('travel__item_active') ?
-//           '' : `${heightWrapper}px`;
-//           items[i].classList.toggle('travel__item_active');
-//       } else {
-//         textWrappers[i].style.height = '';
-//         items[i].classList.remove('travel__item_active');
-//       }
-//     }
-//   });
-// });
 
 // burger
 const burger = document.querySelector('.header__menu-button');
