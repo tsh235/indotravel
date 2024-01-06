@@ -72,7 +72,10 @@ export const timer = () => {
   };
 
   const getTimeRemaining = () => {
-    const dateStop = new Date(deadline).getTime();
+    const greenwichDate = new Date(deadline);
+    const datePlusTree = new Date(greenwichDate.getTime() + (3 * 60 * 60 * 1000));
+    const dateStop = datePlusTree.getTime();
+
     const dateNow = Date.now();
 
     const timeRemaining = dateStop - dateNow;
