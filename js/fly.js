@@ -16,13 +16,10 @@ document.body.append(fly);
 
 const calcPositionFly = () => {
   const maxTop = docEl.clientHeight - fly.clientHeight;
-  console.log('maxTop: ', maxTop);
   const maxScroll = docEl.scrollHeight - docEl.clientHeight;
   const percentScroll = (window.pageYOffset * 100) / maxScroll;
 
   const bottom = maxTop * (percentScroll / 100);
-  console.log('bottom: ', bottom);
-
   fly.style.transform = `translateY(${-bottom}px)`;
 };
 
@@ -30,4 +27,4 @@ window.addEventListener('scroll', () => {
   requestAnimationFrame(calcPositionFly);
 });
 
-// // calcPositionFly();
+calcPositionFly();
