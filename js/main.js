@@ -13,6 +13,8 @@ const getData = async () => {
   return data;
 };
 
+const data = await getData();
+
 const tourDate = document.querySelector('#tour__date');
 const tourPeople = document.querySelector('#tour__people');
 const reservationDate = document.querySelector('#reservation__date');
@@ -23,9 +25,7 @@ const reservationPrice = reservationForm.querySelector('.reservation__price');
 reservationData.textContent = '';
 reservationPrice.textContent = '';
 
-const renderOptionsDate = async (text, select, classes) => {
-  const data = await getData();
-
+const renderOptionsDate = async (data, text, select, classes) => {
   select.innerHTML = `
     <option value="" class="tour__option">${text}</option>
   `;
@@ -65,9 +65,7 @@ const findObject = (arr, value) => {
   return arr.find(obj => obj.date === value);
 };
 
-const renderPeoples = async (selectDate, selectPeople) => {
-  const data = await getData();
-
+const renderPeoples = async (data, selectDate, selectPeople) => {
   selectPeople.innerHTML = `
     <option value="" class="tour__option">Количество человек</option>
   `;
@@ -84,16 +82,16 @@ const renderPeoples = async (selectDate, selectPeople) => {
   });
 };
 
-renderOptionsDate('Выбери дату', tourDate, 'tour__option');
-renderOptionsDate('Дата путешествия', reservationDate, 'tour__option reservation__option');
+renderOptionsDate(data, 'Выбери дату', tourDate, 'tour__option');
+renderOptionsDate(data, 'Дата путешествия', reservationDate, 'tour__option reservation__option');
 
-renderPeoples(tourDate, tourPeople);
-renderPeoples(reservationDate, reservationPeople);
+renderPeoples(data, tourDate, tourPeople);
+renderPeoples(data, reservationDate, reservationPeople);
 
-const changeReservationForm = async () => {
-  const data = await getData();
-
+const createReservationInfo = async (data) => {
   reservationForm.addEventListener('change', () => {
+    reservationData.textContent = '';
+    reservationPrice.textContent = '';
     const date = getValue(reservationDate);
     const people = +getValue(reservationPeople);
     const dateText = dateConversion(date);
@@ -106,4 +104,4 @@ const changeReservationForm = async () => {
   });
 }
 
-changeReservationForm();
+createReservationInfo(data);
