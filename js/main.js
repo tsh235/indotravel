@@ -2,6 +2,7 @@ import { timer } from "./timer.js";
 import './burger.js';
 import './accordion.js';
 import './fly.js';
+import { dateConversion, declension } from "./helper.js";
 
 timer();
 
@@ -95,11 +96,12 @@ const changeReservationForm = async () => {
   reservationForm.addEventListener('change', () => {
     const date = getValue(reservationDate);
     const people = +getValue(reservationPeople);
+    const dateText = dateConversion(date);
   
     if (date === '' || people === 0) return;
     
     const {price} = findObject(data, date);
-    reservationData.textContent = `${date}, ${people} человека`;
+    reservationData.textContent = `${dateText}, ${people} ${declension(['человек', 'человека', 'человек'], people)}`;
     reservationPrice.textContent = `${(people * price).toLocaleString()}₽`
   });
 }

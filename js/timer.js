@@ -1,3 +1,5 @@
+import { declension } from "./helper.js";
+
 export const timer = () => {
   const timerBlock = document.querySelector('[data-timer-deadline]');
   
@@ -65,11 +67,6 @@ export const timer = () => {
     timerCountMinutes,
     timerUnitsMinutes,
   } = createTimer(timerBlock);
-
-  const declension = (words, value) => {
-    const cases = [ 2, 0, 1, 1, 1, 2 ];
-    return words[(value % 100 > 4 && value % 100 < 20) ? 2 : cases[(value % 10 < 5) ? value % 10 : 5]];
-  };
 
   const getTimeRemaining = () => {
     const greenwichDate = new Date(deadline);
