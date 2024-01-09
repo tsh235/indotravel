@@ -1,15 +1,14 @@
-import { timer } from "./timer.js";
+import {timer} from './timer.js';
 import './burger.js';
 import './accordion.js';
 import './fly.js';
-import { dateConversion, declension } from "./helper.js";
+import {dateConversion, declension} from './helper.js';
 
 timer();
 
 const getData = async () => {
   const response = await fetch('date.json');
   const data = await response.json();
-  
   return data;
 };
 
@@ -24,16 +23,14 @@ const reservationPrice = reservationForm.querySelector('.reservation__price');
 reservationData.textContent = '';
 reservationPrice.textContent = '';
 
-//получаем значение селекта
+// получаем значение селекта
 const getValue = (select) => {
   const selectedValue = select.options[select.selectedIndex].value;
   return selectedValue;
 };
 
 // находим объект с нужной датой и вытаскиваем значение
-const findObject = (arr, value) => {
-  return arr.find(obj => obj.date === value);
-};
+const findObject = (arr, value) => arr.find(obj => obj.date === value);
 
 const renderOptionsDate = (data, select) => {
   if (select.classList.contains('tour__select')) {
@@ -45,7 +42,7 @@ const renderOptionsDate = (data, select) => {
       <option value="" class="tour__option">Дата путешествия</option>
     `;
   }
-  
+
   const options = data.map(item => {
     const option = document.createElement('option');
     if (select.classList.contains('tour__select')) {
@@ -70,12 +67,12 @@ const renderOptionsPeople = (data, selectDate, selectPeople) => {
   if (selectDate.value === '') return;
 
   const dateValue = getValue(selectDate);
-    
+
   const {
     'min-people': minPeople,
-    'max-people': maxPeople
+    'max-people': maxPeople,
   } = findObject(data, dateValue);
-  
+
   for (let i = minPeople; i <= maxPeople; i++) {
     const option = document.createElement('option');
     if (selectPeople.classList.contains('tour__select')) {
@@ -93,42 +90,59 @@ const renderOptionsPeople = (data, selectDate, selectPeople) => {
 const renderSelects = () => {
   selectDates.forEach(selectDate => {
     renderOptionsDate(data, selectDate);
-  
+
     selectPeoples.forEach(selectPeople => {
       renderOptionsPeople(data, selectDate, selectPeople);
-    })
+    });
   });
-}
+};
 
-const changePeoples = () => {
+const renderPeoples = () => {
   selectDates.forEach(select => {
     select.addEventListener('change', () => {
-      const selectPeople = document.querySelector(`.${select.classList[0]}[name="people"]`);
+      const selectPeople =
+        document.querySelector(`.${select.classList[0]}[name="people"]`);
       renderOptionsPeople(data, select, selectPeople);
-    })
-  })
+    });
+  });
 };
 
 const reservationInfo = (data) => {
   reservationForm.addEventListener('change', () => {
     const reservationDate = reservationForm.querySelector('#reservation__date');
-    const reservationPeople = reservationForm.querySelector('#reservation__people');
+    const reservationPeople =
+      reservationForm.querySelector('#reservation__people');
 
     reservationData.textContent = '';
     reservationPrice.textContent = '';
     const date = getValue(reservationDate);
     const people = +getValue(reservationPeople);
     const dateText = dateConversion(date);
-  
+
     if (date === '' || people === 0) return;
-    
+
     const {price} = findObject(data, date);
-    reservationData.textContent = `${dateText}, ${people} ${declension(['человек', 'человека', 'человек'], people)}`;
-    reservationPrice.textContent = `${(people * price).toLocaleString()}₽`
+    reservationData.textContent = `
+      ${dateText}, ${people}
+      ${declension(['человек', 'человека', 'человек'], people)}`;
+    reservationPrice.textContent = `${(people * price).toLocaleString()}₽`;
   });
 };
 
+const chandgeSelectDate = () => {
+  selectDates.forEach(select => {
+    select.addEventListener('change', ({target}) => {
+      if (target.classList.contains('tour__select')) {
+        console.log('Меняем значение в форме брони');
+      } else {
+        console.log('Меняем значение в узнать цену');
+      }
+    });
+  });
+};
 
 renderSelects();
-changePeoples();
+renderPeoples();
 reservationInfo(data);
+
+chandgeSelectDate();

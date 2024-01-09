@@ -20,7 +20,7 @@ const fly = () => {
     const maxScroll = docEl.scrollHeight - docEl.clientHeight;
     const percentScroll = (window.pageYOffset * 100) / maxScroll;
     const bottom = maxTop * (percentScroll / 100);
-    
+
     if (bottom === maxTop) {
       airplane.style.transform = `rotate(180deg) translateY(${bottom}px)`;
     } else {
@@ -33,7 +33,7 @@ const fly = () => {
     const maxScroll = docEl.scrollHeight - docEl.clientHeight;
     const percentScroll = (window.pageYOffset * 100) / maxScroll;
     const bottom = maxTop * (percentScroll / 100);
-    
+
     if (bottom === 0) {
       airplane.style.transform = `translateY(${-bottom}px)`;
     } else {
@@ -42,13 +42,13 @@ const fly = () => {
   };
 
   let scrollPos = 0;
-  window.addEventListener('scroll', function() {
+  window.addEventListener('scroll', () => {
     const st = window.scrollY;
     if (st > scrollPos) {
       requestAnimationFrame(calcPositionFlyUp);
     } else {
       requestAnimationFrame(calcPositionFlyDown);
-    };
+    }
     scrollPos = st;
   });
 };
