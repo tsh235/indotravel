@@ -24,7 +24,7 @@ const fly = () => {
     if (bottom === maxTop) {
       airplane.style.transform = `rotate(180deg) translateY(${bottom}px)`;
     } else {
-      airplane.style.transform = `translateY(${-bottom}px)`;
+      airplane.style.transform = `rotate(0deg) translateY(${-bottom}px)`;
     }
   };
 
