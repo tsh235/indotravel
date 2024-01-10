@@ -90,7 +90,6 @@ const renderOptionsPeople = (data, selectDate, selectPeople) => {
 const renderSelects = () => {
   selectDates.forEach(selectDate => {
     renderOptionsDate(data, selectDate);
-
     selectPeoples.forEach(selectPeople => {
       renderOptionsPeople(data, selectDate, selectPeople);
     });
@@ -107,25 +106,29 @@ const renderPeoples = () => {
   });
 };
 
-const reservationInfo = (data) => {
+const changeReservationInfo = () => {
+  const reservationDate = reservationForm.querySelector('#reservation__date');
+  const reservationPeople =
+    reservationForm.querySelector('#reservation__people');
+
+  reservationData.textContent = '';
+  reservationPrice.textContent = '';
+  const date = getValue(reservationDate);
+  const people = +getValue(reservationPeople);
+  const dateText = dateConversion(date);
+
+  if (date === '' || people === 0) return;
+
+  const {price} = findObject(data, date);
+  reservationData.textContent = `
+    ${dateText}, ${people}
+    ${declension(['человек', 'человека', 'человек'], people)}`;
+  reservationPrice.textContent = `${(people * price).toLocaleString()}₽`;
+};
+
+const reservationInfo = () => {
   reservationForm.addEventListener('change', () => {
-    const reservationDate = reservationForm.querySelector('#reservation__date');
-    const reservationPeople =
-      reservationForm.querySelector('#reservation__people');
-
-    reservationData.textContent = '';
-    reservationPrice.textContent = '';
-    const date = getValue(reservationDate);
-    const people = +getValue(reservationPeople);
-    const dateText = dateConversion(date);
-
-    if (date === '' || people === 0) return;
-
-    const {price} = findObject(data, date);
-    reservationData.textContent = `
-      ${dateText}, ${people}
-      ${declension(['человек', 'человека', 'человек'], people)}`;
-    reservationPrice.textContent = `${(people * price).toLocaleString()}₽`;
+    changeReservationInfo();
   });
 };
 
@@ -133,9 +136,33 @@ const chandgeSelectDate = () => {
   selectDates.forEach(select => {
     select.addEventListener('change', ({target}) => {
       if (target.classList.contains('tour__select')) {
-        console.log('Меняем значение в форме брони');
+        const reservationDate =
+          reservationForm.querySelector('.reservation__select');
+        const reservationPeople =
+          reservationForm.querySelector('#reservation__people');
+        reservationDate.selectedIndex = target.selectedIndex;
+        renderOptionsPeople(data, reservationDate, reservationPeople);
       } else {
-        console.log('Меняем значение в узнать цену');
+        const tourDate = tourForm.querySelector('.tour__select');
+        const tourPeople = tourForm.querySelector('#tour__people');
+        tourDate.selectedIndex = target.selectedIndex;
+        renderOptionsPeople(data, tourDate, tourPeople);
+      }
+    });
+  });
+};
+
+const chandgeSelectPeople = () => {
+  selectPeoples.forEach(select => {
+    select.addEventListener('change', ({target}) => {
+      if (target.classList.contains('tour__select')) {
+        const reservationPeople =
+          reservationForm.querySelector('#reservation__people');
+        reservationPeople.selectedIndex = target.selectedIndex;
+        changeReservationInfo();
+      } else {
+        const tourPeople = tourForm.querySelector('#tour__people');
+        tourPeople.selectedIndex = target.selectedIndex;
       }
     });
   });
@@ -143,6 +170,7 @@ const chandgeSelectDate = () => {
 
 renderSelects();
 renderPeoples();
-reservationInfo(data);
 
+reservationInfo();
 chandgeSelectDate();
+chandgeSelectPeople();
