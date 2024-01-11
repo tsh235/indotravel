@@ -1,8 +1,10 @@
+import {declension} from './helper.js';
+
 export const timer = () => {
   const timerBlock = document.querySelector('[data-timer-deadline]');
-  
+
   if (!timerBlock) return;
-  
+
   timerBlock.classList.add('timer');
   timerBlock.style.fontFamily = 'inherit';
   const deadline = timerBlock.dataset.timerDeadline;
@@ -54,7 +56,7 @@ export const timer = () => {
       timerUnitsHours,
       timerCountMinutes,
       timerUnitsMinutes,
-    }
+    };
   };
 
   const {
@@ -66,14 +68,10 @@ export const timer = () => {
     timerUnitsMinutes,
   } = createTimer(timerBlock);
 
-  const declension = (words, value) => {
-    const cases = [ 2, 0, 1, 1, 1, 2 ];
-    return words[(value % 100 > 4 && value % 100 < 20) ? 2 : cases[(value % 10 < 5) ? value % 10 : 5]];
-  };
-
   const getTimeRemaining = () => {
     const greenwichDate = new Date(deadline);
-    const datePlusTree = new Date(greenwichDate.getTime() + (3 * 60 * 60 * 1000));
+    const datePlusTree =
+      new Date(greenwichDate.getTime() + (3 * 60 * 60 * 1000));
     const dateStop = datePlusTree.getTime();
 
     const dateNow = Date.now();
@@ -85,7 +83,7 @@ export const timer = () => {
     const days = Math.floor(timeRemaining / 1000 / 60 / 60 / 24 % 30);
 
     return {timeRemaining, seconds, minutes, hours, days};
-  }
+  };
 
   const startTimer = () => {
     const timer = getTimeRemaining();
@@ -98,16 +96,21 @@ export const timer = () => {
     if (timer.days > 0) {
       timerCountDays.textContent = timer.days;
       timerUnitsDays.textContent = days;
-      timerCountHours.textContent = timer.hours >= 10 ? timer.hours : `0${timer.hours}`;
+      timerCountHours.textContent =
+        timer.hours >= 10 ? timer.hours : `0${timer.hours}`;
       timerUnitsHours.textContent = hours;
-      timerCountMinutes.textContent = timer.minutes >= 10 ? timer.minutes : `0${timer.minutes}`;
+      timerCountMinutes.textContent =
+        timer.minutes >= 10 ? timer.minutes : `0${timer.minutes}`;
       timerUnitsMinutes.textContent = minutes;
     } else {
-      timerCountDays.textContent = timer.hours >= 10 ? timer.hours : `0${timer.hours}`;
+      timerCountDays.textContent =
+        timer.hours >= 10 ? timer.hours : `0${timer.hours}`;
       timerUnitsDays.textContent = hours;
-      timerCountHours.textContent = timer.minutes >= 10 ? timer.minutes : `0${timer.minutes}`;
+      timerCountHours.textContent =
+        timer.minutes >= 10 ? timer.minutes : `0${timer.minutes}`;
       timerUnitsHours.textContent = minutes;
-      timerCountMinutes.textContent = timer.seconds >= 10 ? timer.seconds : `0${timer.seconds}`;
+      timerCountMinutes.textContent =
+        timer.seconds >= 10 ? timer.seconds : `0${timer.seconds}`;
       timerUnitsMinutes.textContent = seconds;
     }
 
@@ -117,7 +120,7 @@ export const timer = () => {
       clearTimeout(intervalId);
       timerBlock.remove();
     }
-  }
-  
+  };
+
   startTimer();
 };
