@@ -193,9 +193,7 @@ const fetchRequest = async (url, {
 
     if (response.ok) {
       const data = await response.json();
-      console.log('data: ', data);
       if (cb) return cb(null, data);
-      console.log('data: ', data);
       return;
     }
 
@@ -207,41 +205,38 @@ const fetchRequest = async (url, {
   }
 };
 
-reservationForm.addEventListener('click', async (e) => {
+const reservationFormBtn =
+  reservationForm.querySelector('.reservation__button');
+
+reservationFormBtn.addEventListener('click', async (e) => {
   e.preventDefault();
-  if (e.target.classList.contains('reservation__button')) {
-    const formData = Object.fromEntries(new FormData(reservationForm));
-    const price =
-      reservationForm.querySelector('.reservation__price').textContent;
+  const formData = Object.fromEntries(new FormData(reservationForm));
+  const price =
+    reservationForm.querySelector('.reservation__price').textContent;
 
-    const checkConfirm = new Promise(resolve => {
-      showModal(formData, price);
-      resolve();
+  const checkConfirm = await showModal(formData, price);
+
+  if (checkConfirm === true) {
+    fetchRequest('https://jsonplaceholder.typicode.com/posts', {
+      method: 'POST',
+      body: {
+        title: 'Бронирование тура',
+        body: formData,
+      },
+      cb(error) {
+        console.log('error: ', error);
+      },
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
     });
-    console.log(checkConfirm);
+
+    const formElems = reservationForm.querySelectorAll('input, select, button');
+
+    for (let i = 0; i < formElems.length; i++) {
+      formElems[i].disabled = true;
+    }
   }
-
-
-  // const formData = Object.fromEntries(new FormData(reservationForm));
-  // console.log('formData: ', formData);
-
-  // fetchRequest('https://jsonplaceholder.typicode.com/posts', {
-  //   method: 'POST',
-  //   body: {
-  //     title: 'Бронирование тура',
-  //     body: formData,
-  //   },
-  //   cb(error) {
-  //     if (error) {
-  //       console.log('error: ', error);
-  //     } else {
-  //       console.log('error: ', error);
-  //     }
-  //   },
-  //   headers: {
-  //     'Content-type': 'application/json; charset=UTF-8',
-  //   },
-  // });
 });
 
 footerForm.addEventListener('submit', (e) => {

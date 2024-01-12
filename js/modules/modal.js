@@ -2,7 +2,6 @@ import {dateConversion, declension} from './helpers.js';
 import loadStyle from './loadStyle.js';
 
 const showModal = async (data, price) => {
-  console.log('data: ', data);
   await loadStyle('/css/modal.css');
 
   const overlay = document.createElement('div');
