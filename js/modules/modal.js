@@ -1,6 +1,8 @@
+import {dateConversion, declension} from './helpers.js';
 import loadStyle from './loadStyle.js';
 
-const showModal = async (err, data) => {
+const showModal = async (data, price) => {
+  console.log('data: ', data);
   await loadStyle('/css/modal.css');
 
   const overlay = document.createElement('div');
@@ -16,16 +18,16 @@ const showModal = async (err, data) => {
   const modalTextPeople = document.createElement('p');
   modalTextPeople.classList.add('modal__text');
   modalTextPeople.textContent = `
-    Бронирование путешествия в Индию на ${data.people} человек`;
+    Бронирование путешествия в Индию на ${data.people}
+      ${declension(['человек', 'человека', 'человек'], +data.people)}`;
 
   const modalTextDate = document.createElement('p');
   modalTextDate.classList.add('modal__text');
-  modalTextDate.textContent = `В даты: ${data.date} - ${data.date}`;
+  modalTextDate.textContent = `В даты: ${dateConversion(data.dates)}`;
 
   const modalTextPrice = document.createElement('p');
   modalTextPrice.classList.add('modal__text');
-  modalTextPrice.textContent = `
-    Стоимость тура ${(data.price * data.people).toLocaleString()}₽`;
+  modalTextPrice.textContent = price;
 
   const modalBtsn = document.createElement('div');
   modalBtsn.classList.add('modal__button');
@@ -48,12 +50,19 @@ const showModal = async (err, data) => {
   );
 
   overlay.append(modal);
-
-  modalBtnEdit.addEventListener('click', () => {
-    overlay.remove();
-  });
-
   document.body.append(overlay);
+
+  return new Promise(resolve => {
+    modalBtnEdit.addEventListener('click', () => {
+      overlay.remove();
+      resolve(false);
+    });
+
+    modalBtnConfirm.addEventListener('click', () => {
+      overlay.remove();
+      resolve(true);
+    });
+  });
 };
 
 export default showModal;

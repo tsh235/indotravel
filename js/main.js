@@ -210,9 +210,15 @@ const fetchRequest = async (url, {
 reservationForm.addEventListener('click', async (e) => {
   e.preventDefault();
   if (e.target.classList.contains('reservation__button')) {
-    fetchRequest(`https://jsonplaceholder.typicode.com/posts`, {
-      cb: showModal,
+    const formData = Object.fromEntries(new FormData(reservationForm));
+    const price =
+      reservationForm.querySelector('.reservation__price').textContent;
+
+    const checkConfirm = new Promise(resolve => {
+      showModal(formData, price);
+      resolve();
     });
+    console.log(checkConfirm);
   }
 
 
