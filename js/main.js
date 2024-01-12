@@ -1,10 +1,8 @@
-import {timer} from './timer.js';
+import './timer.js';
 import './burger.js';
 import './accordion.js';
 import './fly.js';
 import {dateConversion, declension} from './helper.js';
-
-timer();
 
 const getData = async () => {
   const response = await fetch('date.json');
@@ -20,6 +18,7 @@ const selectPeoples = document.querySelectorAll('[name="people"]');
 const reservationForm = document.querySelector('.reservation__form');
 const reservationData = reservationForm.querySelector('.reservation__data');
 const reservationPrice = reservationForm.querySelector('.reservation__price');
+const footerForm = document.querySelector('.footer__form');
 reservationData.textContent = '';
 reservationPrice.textContent = '';
 
@@ -174,3 +173,92 @@ renderPeoples();
 reservationInfo();
 chandgeSelectDate();
 chandgeSelectPeople();
+
+const fetchRequest = async (url, {
+  method = 'GET',
+  cb,
+  body,
+  headers,
+}) => {
+  try {
+    const options = {
+      method,
+    };
+
+    if (body) options.body = JSON.stringify(body);
+    if (headers) options.headers = headers;
+
+    const response = await fetch(url, options);
+
+    if (response.ok) {
+      const data = await response.json();
+      if (cb) cb(null, data);
+      return;
+    }
+
+    throw new Error(
+        `Произошла ошибка ${response.status}: ${response.statusText}`,
+    );
+  } catch (error) {
+    cb(error);
+  }
+};
+
+reservationForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const formData = Object.fromEntries(new FormData(e.target));
+
+  fetchRequest('https://jsonplaceholder.typicode.com/posts', {
+    method: 'POST',
+    body: {
+      title: 'Бронирование тура',
+      body: formData,
+    },
+    cb(error, data) {
+      if (error) {
+        const p = document.createElement('h2');
+        p.style.color = 'red';
+        p.textContent = error;
+        reservationForm.insertAdjacentText('beforeend', p);
+      }
+      reservationForm.insertAdjacentText(
+          'beforeend', `Ваша заявка отправлена, номер заявки ${data.id}`);
+    },
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  });
+});
+
+footerForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const formData = Object.fromEntries(new FormData(e.target));
+
+  fetchRequest('https://jsonplaceholder.typicode.com/posts', {
+    method: 'POST',
+    body: {
+      title: 'Форма в footer',
+      body: formData,
+    },
+    cb(error, data) {
+      if (error) {
+        const p = document.createElement('h2');
+        p.style.color = 'red';
+        p.textContent = error;
+        reservationForm.insertAdjacentText('beforeend', p);
+      }
+      const footerFormTitle = footerForm.querySelector('.footer__form-title');
+      footerFormTitle.textContent = 'Ваша заявка успешно отправлена';
+      const footerFormText = footerForm.querySelector('.footer__text');
+      footerFormText.textContent =
+        'Наши менеджеры свяжутся с вами в течение 3-х рабочих дней';
+      const footerInputWrap = footerForm.querySelector('.footer__input-wrap');
+      footerInputWrap.textContent = '';
+    },
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  });
+});
