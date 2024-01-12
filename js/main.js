@@ -174,6 +174,116 @@ reservationInfo();
 chandgeSelectDate();
 chandgeSelectPeople();
 
+const modalRequest = (err) => {
+  console.log('err: ', err);
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    z-index: 99999;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+  `;
+
+  const modalContent = document.createElement('div');
+  modalContent.style.cssText = `
+    margin: auto;
+    max-width: 980px;
+    padding: 77px 20px 85px;
+    width: 100%;
+    border-radius: 30px;
+    border: 1px solid #AFAFAF;
+    background-color: #FFF;
+    color: #303030;
+    text-align: center;
+  `;
+
+  const modalTitle = document.createElement('h2');
+  modalTitle.style.cssText = `
+    max-width: 580px;
+    margin: 0 auto 40px;
+    font-family: Merriweather;
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  `;
+
+  const modalText = document.createElement('p');
+  modalText.style.cssText = `
+    margin-bottom: 64px;
+    font-family: Nunito;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
+  `;
+
+  const modalImg = document.createElement('div');
+  modalImg.style.cssText = `
+    margin: 0 auto;
+    width: 100px;
+    height: 100px;
+  `;
+
+  modalImg.innerHTML = `
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="50" fill="#78EC6E"/>
+      <g clip-path="url(#clip0_0_1325)">
+        <path d="M42.2618 60.8332L31.4285 49.9999L27.8174 53.611L42.2618 68.0554L73.2142 37.1031L69.6031 33.4919L42.2618 60.8332Z" fill="white"/>
+      </g>
+      <defs>
+        <clipPath id="clip0_0_1325">
+          <rect width="61.9048" height="61.9048" fill="white" transform="translate(19.0476 19.0476)"/>
+        </clipPath>
+      </defs>
+    </svg>
+  `;
+
+  const modalBtn = document.createElement('button');
+  modalBtn.type = 'button';
+  modalBtn.style.cssText = `
+    margin: 0 auto;
+    width: 360px;
+    height: 76px;
+    border-radius: 12px;
+    background-color: #FCB500;
+    color: #fff;
+    font-family: Nunito;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
+  `;
+  modalBtn.textContent = 'Забронировать';
+
+  if (err === null) {
+    modalTitle.textContent = 'Ваша заявка успешно отправлена';
+    modalText.textContent =
+      'Наши менеджеры свяжутся с вами в течении 3-х рабочих дней';
+    modalContent.append(modalTitle, modalText, modalImg);
+  } else {
+    modalTitle.textContent = 'Упс... Что-то пошло не так';
+    modalText.textContent =
+      'Не удалось отправить заявку. Пожалуйста, повторите отправку еще раз';
+    modalContent.append(modalTitle, modalText, modalBtn);
+  }
+
+  modal.append(modalContent);
+  document.body.append(modal);
+
+  if (err === null) {
+    setTimeout(() => {
+      modal.remove();
+      reservationData.textContent = '';
+      reservationPrice.textContent = '';
+      reservationForm.reset();
+    }, 1500);
+  } else {
+    modalBtn.addEventListener('click', () => {
+      modal.remove();
+    });
+  }
+};
+
 const fetchRequest = async (url, {
   method = 'GET',
   cb,
@@ -200,7 +310,7 @@ const fetchRequest = async (url, {
         `Произошла ошибка ${response.status}: ${response.statusText}`,
     );
   } catch (error) {
-    cb(error);
+    cb(error, data);
   }
 };
 
@@ -215,15 +325,13 @@ reservationForm.addEventListener('submit', (e) => {
       title: 'Бронирование тура',
       body: formData,
     },
-    cb(error, data) {
+    cb(error) {
       if (error) {
-        const p = document.createElement('h2');
-        p.style.color = 'red';
-        p.textContent = error;
-        reservationForm.insertAdjacentText('beforeend', p);
+        console.log('error: ', error);
+        modalRequest(error);
+      } else {
+        modalRequest(null);
       }
-      reservationForm.insertAdjacentText(
-          'beforeend', `Ваша заявка отправлена, номер заявки ${data.id}`);
     },
     headers: {
       'Content-type': 'application/json; charset=UTF-8',
@@ -242,7 +350,7 @@ footerForm.addEventListener('submit', (e) => {
       title: 'Форма в footer',
       body: formData,
     },
-    cb(error, data) {
+    cb(error) {
       if (error) {
         const p = document.createElement('h2');
         p.style.color = 'red';
