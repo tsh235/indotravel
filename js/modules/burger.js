@@ -3,6 +3,7 @@ const menu = document.querySelector('.header__menu');
 
 const duration = 1000;
 const distance = 80;
+// eslint-disable-next-line no-unused-vars
 let requestID = NaN;
 
 const menuShow = (duration, callback) => {

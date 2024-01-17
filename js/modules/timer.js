@@ -1,4 +1,4 @@
-import {declension} from './helper.js';
+import {declension} from './helpers.js';
 
 export const timer = () => {
   const timerBlock = document.querySelector('[data-timer-deadline]');
