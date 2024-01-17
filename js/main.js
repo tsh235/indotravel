@@ -205,8 +205,25 @@ const fetchRequest = async (url, {
   }
 };
 
+const reservationFormName =
+  reservationForm.querySelector('#reservation__name');
+const reservationFormPhone =
+  reservationForm.querySelector('#reservation__phone');
 const reservationFormBtn =
   reservationForm.querySelector('.reservation__button');
+
+const maskName = /[^А-ЯЁ\s]/i;
+const maskPhone = /[^+\d]/;
+
+const validateInput = (mask, input) => {
+  input.addEventListener('input', () => {
+    input.value =
+      input.value.replace(mask, '');
+  });
+};
+
+validateInput(maskName, reservationFormName);
+validateInput(maskPhone, reservationFormPhone);
 
 reservationFormBtn.addEventListener('click', async (e) => {
   e.preventDefault();
@@ -216,7 +233,19 @@ reservationFormBtn.addEventListener('click', async (e) => {
 
   const checkConfirm = await showModal(formData, price);
 
-  if (checkConfirm === true) {
+  const validateForm = () => {
+    const nameValue = (reservationForm['clientName'].value).split(' ');
+    // const words = nameValue.split(' ');
+    if (nameValue.length < 3) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const validName = validateForm();
+
+  if (checkConfirm === true && validName === true) {
     fetchRequest('https://jsonplaceholder.typicode.com/posts', {
       method: 'POST',
       body: {
@@ -236,6 +265,8 @@ reservationFormBtn.addEventListener('click', async (e) => {
     for (let i = 0; i < formElems.length; i++) {
       formElems[i].disabled = true;
     }
+  } else {
+    alert('Пожалуйста, введите ваше имя, состоящее из трех слов или более');
   }
 });
 
