@@ -2,6 +2,7 @@ import './modules/timer.js';
 import './modules/burger.js';
 import './modules/accordion.js';
 import './modules/fly.js';
+import './modules/album.js';
 import {dateConversion, declension} from './modules/helpers.js';
 import showModal from './modules/modal.js';
 
@@ -213,7 +214,6 @@ const reservationFormBtn =
   reservationForm.querySelector('.reservation__button');
 
 const maskName = /[^А-ЯЁ\s]/i;
-const maskPhone = /[^+\d]/;
 
 const validateInput = (mask, input) => {
   input.addEventListener('input', () => {
@@ -223,15 +223,18 @@ const validateInput = (mask, input) => {
 };
 
 validateInput(maskName, reservationFormName);
-validateInput(maskPhone, reservationFormPhone);
+
+const phoneMask = new Inputmask('+7 (999) 999-99-99');
+phoneMask.mask(reservationFormPhone);
+
+// Валидация формы
+const justValidate = new JustValidate(reservationForm);
 
 reservationFormBtn.addEventListener('click', async (e) => {
   e.preventDefault();
   const formData = Object.fromEntries(new FormData(reservationForm));
   const price =
     reservationForm.querySelector('.reservation__price').textContent;
-
-  const checkConfirm = await showModal(formData, price);
 
   const validateForm = () => {
     const nameValue = (reservationForm['clientName'].value).split(' ');
@@ -242,7 +245,46 @@ reservationFormBtn.addEventListener('click', async (e) => {
     }
   };
 
-  const validName = validateForm();
+  justValidate
+      .addField('#reservation__date', [
+        {
+          rule: 'required',
+          errorMessage: 'Выберите дату путешествия',
+        },
+      ])
+      .addField('#reservation__people', [
+        {
+          rule: 'required',
+          errorMessage: 'Выберите количество человек',
+        },
+      ])
+      .addField('#reservation__name', [
+        {
+          rule: 'required',
+          errorMessage: 'Выбарите количество человек',
+        },
+        {
+          validator() {
+            const validName = validateForm();
+            return validName;
+          },
+        },
+      ])
+      .addField('#reservation__phone', [
+        {
+          rule: 'required',
+          errorMessage: 'Введите ваш телефон',
+        },
+        {
+          validator() {
+            const phone = reservationFormPhone.inputmask.unmaskedvalue();
+            return !!(Number(phone) && phone.length === 10);
+          },
+          errorMessage: 'Некорректный номер телефона',
+        },
+      ]);
+
+  const checkConfirm = await showModal(formData, price);
 
   if (checkConfirm === true && validName === true) {
     fetchRequest('https://jsonplaceholder.typicode.com/posts', {

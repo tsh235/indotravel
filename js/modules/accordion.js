@@ -17,7 +17,7 @@ items.forEach(item => {
         i.classList.remove('travel__item_active');
         textWrappers.forEach(tw => {
           tw.style.height = '';
-        })
+        });
       });
       textWrapper.style.height =
         item.classList.contains('travel__item_active') ?
@@ -27,5 +27,5 @@ items.forEach(item => {
       textWrapper.style.height = '';
       item.classList.remove('travel__item_active');
     }
-  })
+  });
 });
