@@ -235,7 +235,6 @@ reservationFormBtn.addEventListener('click', async (e) => {
 
   const validateForm = () => {
     const nameValue = (reservationForm['clientName'].value).split(' ');
-    // const words = nameValue.split(' ');
     if (nameValue.length < 3) {
       return false;
     } else {
