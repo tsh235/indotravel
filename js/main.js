@@ -3,8 +3,23 @@ import './modules/burger.js';
 import './modules/accordion.js';
 import './modules/fly.js';
 import './modules/album.js';
-import {dateConversion, declension} from './modules/helpers.js';
 import showModal from './modules/modal.js';
+
+import {renderPeoples, renderReservationInfo, renderSelects} from './modules/render.js';
+import {chandgeSelectDate, chandgeSelectPeople} from './modules/change.js';
+import elems from './modules/elems.js';
+const {
+  reservationForm,
+  reservationData,
+  reservationPrice,
+  reservationFormName,
+  reservationFormPhone,
+  reservationFormBtn,
+  footerForm,
+} = elems;
+
+reservationData.textContent = '';
+reservationPrice.textContent = '';
 
 const getData = async () => {
   const response = await fetch('date.json');
@@ -14,180 +29,11 @@ const getData = async () => {
 
 const data = await getData();
 
-const tourForm = document.querySelector('.tour__form');
-const tourDate = tourForm.querySelector('.tour__select');
-const tourPeople = tourForm.querySelector('#tour__people');
-const selectDates = document.querySelectorAll('[name="dates"]');
-const selectPeoples = document.querySelectorAll('[name="people"]');
-const reservationForm = document.querySelector('.reservation__form');
-const reservationData = reservationForm.querySelector('.reservation__data');
-const reservationPrice = reservationForm.querySelector('.reservation__price');
-const reservationDate = reservationForm.querySelector('#reservation__date');
-const reservationFormName = reservationForm.querySelector('#reservation__name');
-const reservationFormPhone = reservationForm.querySelector('#reservation__phone');
-const reservationFormBtn = reservationForm.querySelector('.reservation__button');
-const reservationPeople = reservationForm.querySelector('#reservation__people');
-const footerForm = document.querySelector('.footer__form');
-reservationData.textContent = '';
-reservationPrice.textContent = '';
-
-// получаем значение селекта
-const getValue = (select) => {
-  const selectedValue = select.options[select.selectedIndex].value;
-  return selectedValue;
-};
-
-// находим объект с нужной датой и вытаскиваем значение
-const findObject = (arr, value) => arr.find(obj => obj.date === value);
-
-const renderOptionsDate = (data, select) => {
-  if (select.classList.contains('tour__select')) {
-    select.innerHTML = `
-      <option value="" class="tour__option">Выбери дату</option>
-    `;
-  } else {
-    select.innerHTML = `
-      <option value="" class="tour__option">Дата путешествия</option>
-    `;
-  }
-
-  const options = data.map(item => {
-    const option = document.createElement('option');
-    if (select.classList.contains('tour__select')) {
-      option.className = 'tour__option';
-    } else {
-      option.className = 'tour__option reservation__option';
-    }
-    option.value = item.date;
-    option.textContent = item.date;
-
-    return option;
-  });
-
-  select.append(...options);
-};
-
-const renderOptionsPeople = (data, selectDate, selectPeople) => {
-  selectPeople.innerHTML = `
-    <option value="" class="tour__option">Количество человек</option>
-  `;
-
-  if (selectDate.value === '') return;
-
-  const dateValue = getValue(selectDate);
-
-  const {
-    'min-people': minPeople,
-    'max-people': maxPeople,
-  } = findObject(data, dateValue);
-
-  for (let i = minPeople; i <= maxPeople; i++) {
-    const option = document.createElement('option');
-    if (selectPeople.classList.contains('tour__select')) {
-      option.className = 'tour__option';
-    } else {
-      option.className = 'tour__option reservation__option';
-    }
-    option.value = i;
-    option.textContent = i;
-
-    selectPeople.append(option);
-  }
-};
-
-const renderSelects = () => {
-  selectDates.forEach(selectDate => {
-    renderOptionsDate(data, selectDate);
-    selectPeoples.forEach(selectPeople => {
-      renderOptionsPeople(data, selectDate, selectPeople);
-    });
-  });
-};
-
-const renderPeoples = () => {
-  selectDates.forEach(select => {
-    select.addEventListener('change', () => {
-      const selectPeople = document.querySelector(`.${select.classList[0]}[name="people"]`);
-      renderOptionsPeople(data, select, selectPeople);
-    });
-  });
-};
-
-const changeReservationInfo = () => {
-  reservationData.textContent = '';
-  reservationPrice.textContent = '';
-  const date = getValue(reservationDate);
-  const people = +getValue(reservationPeople);
-  const dateText = dateConversion(date);
-
-  if (date === '' || people === 0) return;
-
-  const {price} = findObject(data, date);
-  reservationData.textContent = `
-    ${dateText}, ${people}
-    ${declension(['человек', 'человека', 'человек'], people)}
-  `;
-  reservationPrice.textContent = `${(people * price).toLocaleString()}₽`;
-};
-
-const isNotEmpty = () => {
-  const form = reservationForm;
-  const fields = form.elements;
-  let isNotEmpty = true;
-  
-  for (let i = 0; i < fields.length; i++) {
-    if (fields[i].type === 'select-one') {
-      if (fields[i].value.trim() === '') {
-        isNotEmpty = false;
-        break;
-      }
-    }
-  }
-  
-  return isNotEmpty;
-}
-
-const reservationInfo = () => {
-  reservationForm.addEventListener('change', () => {
-    if (isNotEmpty() === true) {
-      changeReservationInfo();
-    }
-  });
-};
-
-const chandgeSelectDate = () => {
-  selectDates.forEach(select => {
-    select.addEventListener('change', ({target}) => {
-      if (target.classList.contains('tour__select')) {
-        reservationDate.selectedIndex = target.selectedIndex;
-        renderOptionsPeople(data, reservationDate, reservationPeople);
-      } else {
-        tourDate.selectedIndex = target.selectedIndex;
-        renderOptionsPeople(data, tourDate, tourPeople);
-      }
-    });
-  });
-};
-
-const chandgeSelectPeople = () => {
-  selectPeoples.forEach(select => {
-    select.addEventListener('change', ({target}) => {
-      if (target.classList.contains('tour__select')) {
-        reservationPeople.selectedIndex = target.selectedIndex;
-        changeReservationInfo();
-      } else {
-        tourPeople.selectedIndex = target.selectedIndex;
-      }
-    });
-  });
-};
-
-renderSelects();
-renderPeoples();
-
-chandgeSelectDate();
-chandgeSelectPeople();
-reservationInfo();
+renderSelects(data);
+renderPeoples(data);
+chandgeSelectDate(data);
+chandgeSelectPeople(data);
+renderReservationInfo(data);
 
 const fetchRequest = async (url, {
   method = 'GET',

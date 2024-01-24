@@ -27,3 +27,26 @@ export const dateConversion = (date) => {
 
   return `${dateStart} - ${dateEnd}`;
 };
+
+export const findObject = (arr, value) => arr.find(obj => obj.date === value);
+
+export const getValue = (select) => {
+  const selectedValue = select.options[select.selectedIndex].value;
+  return selectedValue;
+};
+
+export const isNotEmpty = () => {
+  const fields = reservationForm.elements;
+  let isNotEmpty = true;
+  
+  for (let i = 0; i < fields.length; i++) {
+    if (fields[i].type === 'select-one') {
+      if (fields[i].value.trim() === '') {
+        isNotEmpty = false;
+        break;
+      }
+    }
+  }
+  
+  return isNotEmpty;
+}
