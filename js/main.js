@@ -15,11 +15,18 @@ const getData = async () => {
 const data = await getData();
 
 const tourForm = document.querySelector('.tour__form');
+const tourDate = tourForm.querySelector('.tour__select');
+const tourPeople = tourForm.querySelector('#tour__people');
 const selectDates = document.querySelectorAll('[name="dates"]');
 const selectPeoples = document.querySelectorAll('[name="people"]');
 const reservationForm = document.querySelector('.reservation__form');
 const reservationData = reservationForm.querySelector('.reservation__data');
 const reservationPrice = reservationForm.querySelector('.reservation__price');
+const reservationDate = reservationForm.querySelector('#reservation__date');
+const reservationFormName = reservationForm.querySelector('#reservation__name');
+const reservationFormPhone = reservationForm.querySelector('#reservation__phone');
+const reservationFormBtn = reservationForm.querySelector('.reservation__button');
+const reservationPeople = reservationForm.querySelector('#reservation__people');
 const footerForm = document.querySelector('.footer__form');
 reservationData.textContent = '';
 reservationPrice.textContent = '';
@@ -100,18 +107,13 @@ const renderSelects = () => {
 const renderPeoples = () => {
   selectDates.forEach(select => {
     select.addEventListener('change', () => {
-      const selectPeople =
-        document.querySelector(`.${select.classList[0]}[name="people"]`);
+      const selectPeople = document.querySelector(`.${select.classList[0]}[name="people"]`);
       renderOptionsPeople(data, select, selectPeople);
     });
   });
 };
 
 const changeReservationInfo = () => {
-  const reservationDate = reservationForm.querySelector('#reservation__date');
-  const reservationPeople =
-    reservationForm.querySelector('#reservation__people');
-
   reservationData.textContent = '';
   reservationPrice.textContent = '';
   const date = getValue(reservationDate);
@@ -123,13 +125,33 @@ const changeReservationInfo = () => {
   const {price} = findObject(data, date);
   reservationData.textContent = `
     ${dateText}, ${people}
-    ${declension(['человек', 'человека', 'человек'], people)}`;
+    ${declension(['человек', 'человека', 'человек'], people)}
+  `;
   reservationPrice.textContent = `${(people * price).toLocaleString()}₽`;
 };
 
+const isNotEmpty = () => {
+  const form = reservationForm;
+  const fields = form.elements;
+  let isNotEmpty = true;
+  
+  for (let i = 0; i < fields.length; i++) {
+    if (fields[i].type === 'select-one') {
+      if (fields[i].value.trim() === '') {
+        isNotEmpty = false;
+        break;
+      }
+    }
+  }
+  
+  return isNotEmpty;
+}
+
 const reservationInfo = () => {
   reservationForm.addEventListener('change', () => {
-    changeReservationInfo();
+    if (isNotEmpty() === true) {
+      changeReservationInfo();
+    }
   });
 };
 
@@ -137,15 +159,9 @@ const chandgeSelectDate = () => {
   selectDates.forEach(select => {
     select.addEventListener('change', ({target}) => {
       if (target.classList.contains('tour__select')) {
-        const reservationDate =
-          reservationForm.querySelector('.reservation__select');
-        const reservationPeople =
-          reservationForm.querySelector('#reservation__people');
         reservationDate.selectedIndex = target.selectedIndex;
         renderOptionsPeople(data, reservationDate, reservationPeople);
       } else {
-        const tourDate = tourForm.querySelector('.tour__select');
-        const tourPeople = tourForm.querySelector('#tour__people');
         tourDate.selectedIndex = target.selectedIndex;
         renderOptionsPeople(data, tourDate, tourPeople);
       }
@@ -157,12 +173,9 @@ const chandgeSelectPeople = () => {
   selectPeoples.forEach(select => {
     select.addEventListener('change', ({target}) => {
       if (target.classList.contains('tour__select')) {
-        const reservationPeople =
-          reservationForm.querySelector('#reservation__people');
         reservationPeople.selectedIndex = target.selectedIndex;
         changeReservationInfo();
       } else {
-        const tourPeople = tourForm.querySelector('#tour__people');
         tourPeople.selectedIndex = target.selectedIndex;
       }
     });
@@ -172,9 +185,9 @@ const chandgeSelectPeople = () => {
 renderSelects();
 renderPeoples();
 
-reservationInfo();
 chandgeSelectDate();
 chandgeSelectPeople();
+reservationInfo();
 
 const fetchRequest = async (url, {
   method = 'GET',
@@ -206,23 +219,22 @@ const fetchRequest = async (url, {
   }
 };
 
-const reservationFormName =
-  reservationForm.querySelector('#reservation__name');
-const reservationFormPhone =
-  reservationForm.querySelector('#reservation__phone');
-const reservationFormBtn =
-  reservationForm.querySelector('.reservation__button');
-
-const maskName = /[^А-ЯЁ\s]/i;
-
-const validateInput = (mask, input) => {
-  input.addEventListener('input', () => {
-    input.value =
-      input.value.replace(mask, '');
+const validName = () => {
+  const mask = /[^А-ЯЁ\s]/i;
+  reservationFormName.addEventListener('input', () => {
+    reservationFormName.value =
+    reservationFormName.value.replace(mask, '');
   });
+
+  const nameValue = reservationFormName.value.split(' ');
+  if (nameValue.length < 3) {
+    return false;
+  } else {
+    return true;
+  }
 };
 
-validateInput(maskName, reservationFormName);
+validName();
 
 const phoneMask = new Inputmask('+7 (999) 999-99-99');
 phoneMask.mask(reservationFormPhone);
@@ -230,63 +242,47 @@ phoneMask.mask(reservationFormPhone);
 // Валидация формы
 const justValidate = new JustValidate(reservationForm);
 
+justValidate
+  .addField('#reservation__date', [
+    {
+      rule: 'required',
+      errorMessage: 'Выберите дату путешествия',
+    },
+  ])
+  .addField('#reservation__people', [
+    {
+      rule: 'required',
+      errorMessage: 'Выберите количество человек',
+    },
+  ])
+  .addField('#reservation__name', [
+    {
+      rule: 'required',
+      errorMessage: 'Введите ваше имя, состоящее из трех или более слов',
+    },
+  ])
+  .addField('#reservation__phone', [
+    {
+      rule: 'required',
+      errorMessage: 'Введите ваш телефон',
+    },
+    {
+      validator() {
+        const phone = reservationFormPhone.inputmask.unmaskedvalue();
+        return !!(Number(phone) && phone.length === 10);
+      },
+      errorMessage: 'Некорректный номер телефона',
+    },
+  ]);
+
 reservationFormBtn.addEventListener('click', async (e) => {
   e.preventDefault();
   const formData = Object.fromEntries(new FormData(reservationForm));
-  const price =
-    reservationForm.querySelector('.reservation__price').textContent;
-
-  const validateForm = () => {
-    const nameValue = (reservationForm['clientName'].value).split(' ');
-    if (nameValue.length < 3) {
-      return false;
-    } else {
-      return true;
-    }
-  };
-
-  justValidate
-      .addField('#reservation__date', [
-        {
-          rule: 'required',
-          errorMessage: 'Выберите дату путешествия',
-        },
-      ])
-      .addField('#reservation__people', [
-        {
-          rule: 'required',
-          errorMessage: 'Выберите количество человек',
-        },
-      ])
-      .addField('#reservation__name', [
-        {
-          rule: 'required',
-          errorMessage: 'Выбарите количество человек',
-        },
-        {
-          validator() {
-            const validName = validateForm();
-            return validName;
-          },
-        },
-      ])
-      .addField('#reservation__phone', [
-        {
-          rule: 'required',
-          errorMessage: 'Введите ваш телефон',
-        },
-        {
-          validator() {
-            const phone = reservationFormPhone.inputmask.unmaskedvalue();
-            return !!(Number(phone) && phone.length === 10);
-          },
-          errorMessage: 'Некорректный номер телефона',
-        },
-      ]);
+  const price = reservationForm.querySelector('.reservation__price').textContent;
 
   const checkConfirm = await showModal(formData, price);
 
-  if (checkConfirm === true && validName === true) {
+  if (checkConfirm === true) {
     fetchRequest('https://jsonplaceholder.typicode.com/posts', {
       method: 'POST',
       body: {
@@ -306,8 +302,6 @@ reservationFormBtn.addEventListener('click', async (e) => {
     for (let i = 0; i < formElems.length; i++) {
       formElems[i].disabled = true;
     }
-  } else {
-    alert('Пожалуйста, введите ваше имя, состоящее из трех слов или более');
   }
 });
 
