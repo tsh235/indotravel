@@ -1,3 +1,9 @@
+import elems from "./elems.js";
+
+const {
+  reservationForm,
+} = elems;
+
 export const declension = (words, value) => {
   const cases = [2, 0, 1, 1, 1, 2];
   return words[(value % 100 > 4 && value % 100 < 20) ?

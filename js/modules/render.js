@@ -3,6 +3,7 @@ import elems from "./elems.js";
 import { findObject, getValue, isNotEmpty } from "./helpers.js";
 
 const {
+  reservationForm,
   selectDates,
   selectPeoples,
 } = elems;
