@@ -80,13 +80,16 @@ const validName = () => {
   }
 };
 
-validName();
-
 const phoneMask = new Inputmask('+7 (999) 999-99-99');
 phoneMask.mask(reservationFormPhone);
 
 // Валидация формы
-const justValidate = new JustValidate(reservationForm);
+const justValidate = new JustValidate(reservationForm, {
+  errorLabelStyle: {
+    color: '#D11616',
+    fontSize: '14px',
+  },
+});
 
 justValidate
   .addField('#reservation__date', [
@@ -104,8 +107,14 @@ justValidate
   .addField('#reservation__name', [
     {
       rule: 'required',
-      errorMessage: 'Введите ваше имя, состоящее из трех или более слов',
+      errorMessage: 'Введите ваше имя',
     },
+    {
+      validator() {
+        return validName();
+      },
+      errorMessage: 'Нужно ввести не менее 3х слов',
+    }
   ])
   .addField('#reservation__phone', [
     {
@@ -119,37 +128,36 @@ justValidate
       },
       errorMessage: 'Некорректный номер телефона',
     },
-  ]);
-
-reservationFormBtn.addEventListener('click', async (e) => {
-  e.preventDefault();
-  const formData = Object.fromEntries(new FormData(reservationForm));
-  const price = reservationForm.querySelector('.reservation__price').textContent;
-
-  const checkConfirm = await showModal(formData, price);
-
-  if (checkConfirm === true) {
-    fetchRequest('https://jsonplaceholder.typicode.com/posts', {
-      method: 'POST',
-      body: {
-        title: 'Бронирование тура',
-        body: formData,
-      },
-      cb(error) {
-        console.log('error: ', error);
-      },
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    });
-
-    const formElems = reservationForm.querySelectorAll('input, select, button');
-
-    for (let i = 0; i < formElems.length; i++) {
-      formElems[i].disabled = true;
+  ])
+  .onSuccess(async (e) => {
+    e.preventDefault();
+    const formData = Object.fromEntries(new FormData(reservationForm));
+    const price = reservationForm.querySelector('.reservation__price').textContent;
+  
+    const checkConfirm = await showModal(formData, price);
+  
+    if (checkConfirm === true) {
+      fetchRequest('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        body: {
+          title: 'Бронирование тура',
+          body: formData,
+        },
+        cb(error) {
+          console.log('error: ', error);
+        },
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      });
+  
+      const formElems = reservationForm.querySelectorAll('input, select, button');
+  
+      for (let i = 0; i < formElems.length; i++) {
+        formElems[i].disabled = true;
+      }
     }
-  }
-});
+  }); 
 
 footerForm.addEventListener('submit', (e) => {
   e.preventDefault();
