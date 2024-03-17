@@ -8,7 +8,7 @@ const fly = () => {
     height: 50px;
     bottom: 0;
     right: 0;
-    background: url('./../../img/airplane.svg') center/contain no-repeat;
+    background: url('./../img/airplane.svg') center/contain no-repeat;
     pointer-events: none;
     z-index: 100;
   `;
